@@ -3,9 +3,9 @@ Fast &amp; extensible logging framework for Haskell!
 
 # Overview
 
-Logging is a fast and extensible Haskell logging framework. 
+Logger is a fast and extensible Haskell logging framework. 
 
-Logging allows you to log any kind of messages in both IO as well as pure code, depending on the informations you want to log.
+Logger allows you to log any kind of messages in both IO as well as pure code, depending on the informations you want to log.
 
 The framework bases on the idea of logger transformer stack defining the way it works. You can build your own stack to highly tailor the behaviour to your needs, starting with such simple things, like logging messages to a list, ending on logging compile-time, priority-filtered messages from different threads and gathering them in other logger thread.
 
