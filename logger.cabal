@@ -1,0 +1,91 @@
+name:                logger
+category:            System
+version:             0.1.0.0
+license:             Apache-2.0
+license-file:        LICENSE
+cabal-version:       >=1.10
+author:              Wojciech Danilo
+maintainer:          Wojciech Danilo <wojciech.danilo@gmail.com>
+stability:           provisional
+synopsis:            Fast & extensible logging framework
+copyright:           Copyright (C) 2015 Wojciech Danilo
+tested-with:         GHC == 7.8.3
+build-type:          Simple
+homepage:            https://github.com/wdanilo/haskell-logger
+bug-reports:         https://github.com/wdanilo/haskell-logger/issues
+
+description:         
+
+  Logging is a fast and extensible Haskell logging framework. 
+  .
+  Logging allows you to log any kind of messages in both IO as well as pure code, depending on the informations you want to log.
+  .
+  The framework bases on the idea of logger transformer stack defining the way it works. You can build your own stack to highly tailor the behaviour to your needs, starting with such simple things, like logging messages to a list, ending on logging compile-time, priority-filtered messages from different threads and gathering them in other logger thread.
+  .
+  For detailed documentation and examples look at the ''System.Log'' module.
+
+extra-source-files:  README.md
+
+source-repository head
+  type: git
+  location: git://github.com/wdanilo/haskell-logger.git
+
+library
+  exposed-modules:     
+      System.Log, 
+      System.Log.Tuples, 
+      System.Log.Simple, 
+      System.Log.Filter, 
+      System.Log.Level, 
+      System.Log.Format, 
+      System.Log.Data, 
+      System.Log.Log, 
+      System.Log.TH, 
+      System.Log.Logger.Base, 
+      System.Log.Logger.Writer, 
+      System.Log.Logger.Thread, 
+      System.Log.Logger.Priority, 
+      System.Log.Logger.Handler, 
+      System.Log.Logger.Drop
+  
+  -- other-modules:    
+
+  default-extensions:
+      DefaultSignatures,
+      ViewPatterns,
+      DeriveFunctor,
+      TupleSections,
+      StandaloneDeriving,
+      MultiParamTypeClasses,
+      ConstraintKinds,
+      FlexibleContexts,
+      FlexibleInstances,
+      GeneralizedNewtypeDeriving
+  
+  -- LANGUAGE extensions used by modules in this package.
+  other-extensions:
+      KindSignatures,
+      TypeFamilies,
+      FunctionalDependencies,
+      UndecidableInstances,
+      NoMonomorphismRestriction,
+      OverlappingInstances,
+      TemplateHaskell,
+      CPP,
+      OverloadedStrings
+  
+  build-depends:
+      base >=4.7 && <4.8,
+      transformers >=0.4 && <0.5,
+      time >=1.5 && <1.6,
+      ansi-wl-pprint >=0.6 && <0.7,
+      lens >=4.6 && <4.7,
+      template-haskell >=2.9 && <2.10,
+      mtl >=2.2 && <2.3,
+      containers >=0.5 && <0.6,
+      unagi-chan >=0.3 && <0.4
+  
+  hs-source-dirs:      src
+  
+  default-language:    Haskell2010
+  
