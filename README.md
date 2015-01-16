@@ -5,7 +5,7 @@ Fast &amp; extensible logging framework for Haskell!
 
 Logger is a fast and extensible Haskell logging framework. 
 
-Logger allows you to log any kind of messages in both IO as well as pure code, depending on the informations you want to log.
+Logger allows you to log any kind of messages in both IO as well as pure code, depending on the information you want to log.
 
 The framework bases on the idea of logger transformer stack defining the way it works. You can build your own stack to highly tailor the behaviour to your needs, starting with such simple things, like logging messages to a list, ending on logging compile-time, priority-filtered messages from different threads and gathering them in other logger thread.
 
@@ -33,10 +33,10 @@ main = print $ runBaseLogger (Lvl, Msg) test
 -- output: "Done"
 ```
 
-There are few things to not here:
-* We are importing the ''System.Log.Simple'' interface. It provides all necessary functions to start with the library. There is other interface, ''System.Log.TH'', which provides simmilar functionality, but allows additionally logging such informations like file or module name and log location inside the file.
+There are few things to note here:
+* We are importing the ''System.Log.Simple'' interface. It provides all necessary functions to start with the library. There is another interface, ''System.Log.TH'', which provides simmilar functionality, but allows additionally logging such informations like file or module name and log location inside the file.
 * We are running the logger using 'runBaseLogger' function providing the description what type of information we want to gather with each call to 'debug', 'warning', etc. This is very important, because we can choose only the needed information, like messages and levels and run the logger as a pure code. If you try to run the example with other description, like ```(Lvl, Msg, Time)```, it will fail complaining that it needs the 'IO' monad for that.
-* The 'BaseLogger' is the most base logger transformer and it should be run as a base for every logger transformer stack. It do not log any messages under the hood, in fact you cannot do anything sensible with it.
+* The 'BaseLogger' is the most base logger transformer and it should be run as a base for every logger transformer stack. It does not log any messages under the hood, in fact you cannot do anything sensible with it.
 
 As every logger transformer, 'BaseLogger' has an appriopriate transformer type called 'BaseLoggerT'. You can use it just as every monad transformer, to pipe computations to an underlying monad. Using the transformer we can ask our logger to log also such information as the time:
 
