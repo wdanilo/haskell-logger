@@ -34,9 +34,9 @@ main = print $ runBaseLogger (Lvl, Msg) test
 ```
 
 There are few things to not here:
-    * We are importing the ''System.Log.Simple'' interface. It provides all necessary functions to start with the library. There is other interface, ''System.Log.TH'', which provides simmilar functionality, but allows additionally logging such informations like file or module name and log location inside the file.
-    * We are running the logger using 'runBaseLogger' function providing the description what type of information we want to gather with each call to 'debug', 'warning', etc. This is very important, because we can choose only the needed information, like messages and levels and run the logger as a pure code. If you try to run the example with other description, like ```(Lvl, Msg, Time)```, it will fail complaining that it needs the 'IO' monad for that.
-    * The 'BaseLogger' is the most base logger transformer and it should be run as a base for every logger transformer stack. It do not log any messages under the hood, in fact you cannot do anything sensible with it.
+* We are importing the ''System.Log.Simple'' interface. It provides all necessary functions to start with the library. There is other interface, ''System.Log.TH'', which provides simmilar functionality, but allows additionally logging such informations like file or module name and log location inside the file.
+* We are running the logger using 'runBaseLogger' function providing the description what type of information we want to gather with each call to 'debug', 'warning', etc. This is very important, because we can choose only the needed information, like messages and levels and run the logger as a pure code. If you try to run the example with other description, like ```(Lvl, Msg, Time)```, it will fail complaining that it needs the 'IO' monad for that.
+* The 'BaseLogger' is the most base logger transformer and it should be run as a base for every logger transformer stack. It do not log any messages under the hood, in fact you cannot do anything sensible with it.
 
 As every logger transformer, 'BaseLogger' has an appriopriate transformer type called 'BaseLoggerT'. You can use it just as every monad transformer, to pipe computations to an underlying monad. Using the transformer we can ask our logger to log also such information as the time:
 
@@ -317,7 +317,7 @@ Which results in:
 [Debug] my custom debug (7)
 ```
 
-#### monad data providers
+#### Monad data providers
 
 What happens when such data is not provided when constructing the message? Like 'Time' data? If data is not available at construction time, the logger looks for its 'DataGetter' instance. A simple 'Time' data provider could be defined as:
 
