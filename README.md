@@ -317,7 +317,7 @@ Which results in:
 [Debug] my custom debug (7)
 ```
 
-A new function `appData` is used here. It allows providing a data to be registered when creating log messages. You can provide this way any data you want and only the data will be used, that is explicitly defined when running a logger. If you run a logger asking about thata that was not provided when constructing the log, the framework will look for it's monad data provider (described later). If there will be no such provider, it will fail at compile-time.
+A new function `appData` is used here. It allows providing a data to be registered when creating log messages. You can provide this way any data you want and only the data will be used, that is explicitly defined when running a logger. If you run a logger asking about data that was not provided when constructing the log, the framework will look for it's monad data provider (described later). If there will be no such provider, it will fail at compile-time.
 
 In fact, if we look how the log function is defined, we will find some similarities:
 
