@@ -322,7 +322,7 @@ A new function `appData` is used here. It allows providing a data to be register
 In fact, if we look how the log function is defined, we will find some similarities:
 
 ```haskell
-log rec pri msg = do
+log rec pri msg = 
     appendRecord $ appData Lvl (mkLevel pri)
                  $ appData Msg msg
                  $ rec
