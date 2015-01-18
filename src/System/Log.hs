@@ -41,7 +41,8 @@ main = print $ runBaseLogger (Lvl, Msg) test
 -- output: "Done"
 @
 
-There are few things to not here:
+There are few things to note here:
+
     * We are importing the ''System.Log.Simple'' interface. It provides all necessary functions to start with the library. There is other interface, ''System.Log.TH'', which provides simmilar functionality, but allows additionally logging such informations like file or module name and log location inside the file.
     * We are running the logger using 'runBaseLogger' function providing the description what type of information we want to gather with each call to 'debug', 'warning', etc. This is very important, because we can choose only the needed information, like messages and levels and run the logger as a pure code. If you try to run the example with other description, like @(Lvl, Msg, Time)@, it will fail complaining that it needs the 'IO' monad for that.
     * The 'BaseLogger' is the most base logger transformer and it should be run as a base for every logger transformer stack. It do not log any messages under the hood, in fact you cannot do anything sensible with it.
