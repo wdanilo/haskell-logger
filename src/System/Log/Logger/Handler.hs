@@ -80,17 +80,17 @@ printHandler = mkHandler "PrintHandler" handle where
     handle defDoc l = liftIO $ putDoc defDoc *> putStrLn ""
 
 ----------------------------------------------------------------------
--- HandlerLogger
+-- HandlerLoggerT
 ----------------------------------------------------------------------
 
-newtype HandlerLogger m a = HandlerLogger { fromHandlerLogger :: StateT (Handler' (HandlerLogger m)) m a } deriving (Monad, MonadIO, Applicative, Functor)
+newtype HandlerLoggerT m a = HandlerLoggerT { fromHandlerLogger :: StateT (Handler' (HandlerLoggerT m)) m a } deriving (Monad, MonadIO, Applicative, Functor)
 
-type instance LogFormat (HandlerLogger m) = LogFormat m
+type instance LogFormat (HandlerLoggerT m) = LogFormat m
 
-instance MonadTrans HandlerLogger where
-    lift = HandlerLogger . lift
+instance MonadTrans HandlerLoggerT where
+    lift = HandlerLoggerT . lift
 
-runHandlerLoggerT :: (Functor m, Monad m) => Formatter (LogFormat m) -> HandlerLogger m b -> m b
+runHandlerLoggerT :: (Functor m, Monad m) => Formatter (LogFormat m) -> HandlerLoggerT m b -> m b
 runHandlerLoggerT fmt = fmap fst . flip runStateT (topHandler fmt) . fromHandlerLogger
 
 
@@ -106,21 +106,21 @@ runHandler defDoc l h = act <* mapM (runHandler doc l) (h^.children) where
     runFilters h l = foldr (&&) True $ fmap (\f -> runFilter f l) (h^.filters)
 
 
-getTopHandler = HandlerLogger State.get
-putTopHandler = HandlerLogger . State.put
+getTopHandler = HandlerLoggerT State.get
+putTopHandler = HandlerLoggerT . State.put
 
 -- === Instances ===
 
 instance (MonadLogger m, Functor m, l~LogFormat m, LookupDataSet Msg l, LookupDataSet Lvl l)
-      => MonadLogger (HandlerLogger m) where
-    appendLog l =  (runHandler defDoc l =<< getTopHandler) 
+      => MonadLogger (HandlerLoggerT m) where
+    appendLog l =  (runHandler defDoc l =<< getTopHandler)
                 *> lift (appendLog l)
         where defDoc = runFormatter defaultFormatter l
 
-instance (Monad m, Functor m) => MonadLoggerHandler (HandlerLogger m) (HandlerLogger m) where
+instance (Monad m, Functor m) => MonadLoggerHandler (HandlerLoggerT m) (HandlerLoggerT m) where
     addHandler h = do
         topH <- getTopHandler
         putTopHandler $ addChildHandler h topH
 
-instance (Functor m, MonadLogger m, l~LogFormat m, LogBuilder d (HandlerLogger m), LookupDataSet Msg l, LookupDataSet Lvl l) 
-      => MonadRecord d (HandlerLogger m)
+instance (Functor m, MonadLogger m, l~LogFormat m, LogBuilder d (HandlerLoggerT m), LookupDataSet Msg l, LookupDataSet Lvl l)
+      => MonadRecord d (HandlerLoggerT m)
