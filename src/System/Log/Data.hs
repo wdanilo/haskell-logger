@@ -28,7 +28,15 @@ import Control.Applicative    hiding (empty)
 import System.Log.Log         (MonadLogger, LogFormat, Log(Log), fromLog, appendLog)
 import Data.Time.Clock        (getCurrentTime, UTCTime)
 import Control.Lens
-
+import Control.Monad.Trans.Class
+import Control.Monad.Trans.Except
+import Control.Monad.Trans.List
+import Control.Monad.Trans.Maybe
+import Control.Monad.Trans.Reader
+import Control.Monad.Trans.RWS
+import Control.Monad.Trans.State
+import Control.Monad.Trans.Writer
+import Data.Monoid
 
 ----------------------------------------------------------------------
 -- Logging utils
@@ -61,6 +69,28 @@ class MonadRecord d m where
     appendRecord d = do
         l <- buildLog d
         appendLog l
+
+instance (Monad m, MonadRecord d m) => MonadRecord d (ExceptT e m) where
+    appendRecord = lift . appendRecord
+
+instance (Monad m, MonadRecord d m) => MonadRecord d (ListT m) where
+    appendRecord = lift . appendRecord
+
+instance (Monad m, MonadRecord d m) => MonadRecord d (MaybeT m) where
+    appendRecord = lift . appendRecord
+
+instance (Monad m, MonadRecord d m) => MonadRecord d (ReaderT s m) where
+    appendRecord = lift . appendRecord
+
+instance (Monad m, Monoid w, MonadRecord d m) => MonadRecord d (RWST r w s m) where
+    appendRecord = lift . appendRecord
+
+instance (Monad m, MonadRecord d m) => MonadRecord d (StateT s m) where
+    appendRecord = lift . appendRecord
+
+instance (Monad m, Monoid w, MonadRecord d m) => MonadRecord d (WriterT w m) where
+    appendRecord = lift . appendRecord
+
 
 appData :: (a~DataOf base) => base -> a -> RecordBuilder as -> RecordBuilder (Data base, as)
 appData base a = fmap (Data base a,)
@@ -105,7 +135,7 @@ instance (LogBuilderProto (Data x,xs) m ys, LogBuilderProto xs m (Data y,()), Mo
         Log ys     <- buildLogProto b
         Log (y,()) <- buildLogProto $ RecordBuilder xs
         return $ Log (y, ys)
-      
+
 instance Monad m => LogBuilderProto a m () where
     buildLogProto _ = return $ Log ()
 
@@ -117,7 +147,7 @@ instance (Functor m, Applicative m, DataGetter y m, LogBuilderProto () m ys) => 
 -- Data reading
 ----------------------------------------------------------------------
 
-class Lookup base s where 
+class Lookup base s where
     lookup :: base -> s -> Data base
 
 readData :: Lookup a l => a -> l -> DataOf a
@@ -133,7 +163,7 @@ instance LookupDataSet base r => Lookup base (RecordBuilder r) where
 
 ---
 
-class LookupDataSet base s where 
+class LookupDataSet base s where
     lookupDataSet :: base -> s -> Data base
 
 instance LookupDataSet base (Data base,as) where
@@ -161,7 +191,7 @@ data Msg = Msg deriving (Show)
 type instance DataOf Msg = String
 
 
--- Lvl -- 
+-- Lvl --
 
 data Lvl = Lvl deriving (Show)
 type instance DataOf Lvl = LevelData
