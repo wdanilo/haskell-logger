@@ -23,14 +23,19 @@ import           System.Log.Data               (MonadRecord(appendRecord), LogBu
 import           System.Log.Filter             (Filter, runFilter)
 import           Control.Lens                  hiding (children)
 import           System.Log.Log                (Log, MonadLogger(appendLog), LogFormat, LogFormat)
-import           Control.Monad.Trans           (lift)
+import           Control.Monad.Trans           (MonadTrans, lift)
+import           Control.Monad.Trans.Except
+import           Control.Monad.Trans.List
+import           Control.Monad.Trans.Maybe
+import           Control.Monad.Trans.Reader
+import           Control.Monad.Trans.RWS
+import           Control.Monad.Trans.State
+import           Control.Monad.Trans.Writer
 import           Control.Monad.State           (StateT, runStateT)
 import qualified Control.Monad.State           as State
 import           Control.Monad.IO.Class        (MonadIO, liftIO)
 import           System.Log.Format             (Formatter, runFormatter, defaultFormatter)
 import           Text.PrettyPrint.ANSI.Leijen  (Doc, putDoc)
-import Control.Monad.Trans (MonadTrans)
-
 
 ----------------------------------------------------------------------
 -- MonadLoggerHandler
@@ -41,6 +46,14 @@ class MonadLoggerHandler n m | m -> n where
 
     default addHandler :: (Monad m, MonadTrans t) => Handler n (LogFormat m) -> t m ()
     addHandler = lift . addHandler
+
+instance (Monad m, MonadLoggerHandler n m) => MonadLoggerHandler n (ExceptT e m)
+instance (Monad m, MonadLoggerHandler n m) => MonadLoggerHandler n (ListT m)
+instance (Monad m, MonadLoggerHandler n m) => MonadLoggerHandler n (MaybeT m)
+instance (Monad m, MonadLoggerHandler n m) => MonadLoggerHandler n (ReaderT r m)
+instance (Monad m, Monoid w, MonadLoggerHandler n m) => MonadLoggerHandler n (RWST r w s m)
+instance (Monad m, MonadLoggerHandler n m) => MonadLoggerHandler n (StateT s m)
+instance (Monad m, Monoid w, MonadLoggerHandler n m) => MonadLoggerHandler n (WriterT w m)
 
 ----------------------------------------------------------------------
 -- Handler
