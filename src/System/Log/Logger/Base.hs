@@ -23,9 +23,9 @@ import Control.Monad.Identity (runIdentity)
 -- BaseLoggerT
 ----------------------------------------------------------------------
 
-newtype BaseLoggerT l m a = BaseLoggerT { runRawBaseLoggerT :: m a } deriving (Monad, MonadIO, Applicative, Functor) 
+newtype BaseLoggerT l m a = BaseLoggerT { runRawBaseLoggerT :: m a } deriving (Monad, MonadIO, Applicative, Functor)
 
-runBaseLoggerT :: (Functor m, Monad m) => l -> BaseLoggerT (MapRTuple Data (Tuple2RTuple l)) m a -> m a
+runBaseLoggerT :: l -> BaseLoggerT (MapRTuple Data (Tuple2RTuple l)) m a -> m a
 runBaseLoggerT _ = runRawBaseLoggerT
 
 runBaseLogger d = runIdentity . runBaseLoggerT d
