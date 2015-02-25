@@ -162,11 +162,11 @@ test = do
         liftIO $ print "Threaded print"
         debug "debug in fork"
     liftIO $ print "End of the test!"
-    
-print =<< ( runBaseLoggerT (Lvl, Msg) 
-          . runHandlerLoggerT defaultFormatter 
-          . runPriorityLoggerT Warning 
-          . runThreadedLogger
+
+print =<< ( runBaseLoggerT (Lvl, Msg)
+          . runHandlerLoggerT defaultFormatter
+          . runPriorityLoggerT Warning
+          . runThreadedLoggerT
           ) test
 @
 
@@ -196,9 +196,9 @@ test = do
         debug "debug in fork"
     warning "a warning"
 
-print =<< ( runBaseLoggerT (Lvl, Msg) 
-          . runHandlerLoggerT defaultFormatter 
-          . runThreadedLogger
+print =<< ( runBaseLoggerT (Lvl, Msg)
+          . runHandlerLoggerT defaultFormatter
+          . runThreadedLoggerT
           ) test
 @
 
@@ -227,10 +227,10 @@ test = do
     $(debug "another debug")
     $(warning "a warning")
 
-print =<< ( runBaseLoggerT (Lvl, Msg, Loc) 
+print =<< ( runBaseLoggerT (Lvl, Msg, Loc)
           . runHandlerLoggerT defaultFormatterTH
-          . runPriorityLoggerT Warning 
-          . runThreadedLogger
+          . runPriorityLoggerT Warning
+          . runThreadedLoggerT
           ) test
 @
 

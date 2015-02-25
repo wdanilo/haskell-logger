@@ -29,38 +29,38 @@ import           System.Log.Data        (MonadRecord, LogBuilderProto)
 import           Control.Monad.Trans    (MonadTrans, lift)
 
 ----------------------------------------------------------------------
--- WriterLogger
+-- WriterLoggerT
 ----------------------------------------------------------------------
 
 type Logs m = Seq (Log (LogFormat m))
 
-newtype WriterLogger m a = WriterLogger { fromWriterLogger :: StateT (Logs m) m a } deriving (Monad, MonadIO, Applicative, Functor)
+newtype WriterLoggerT m a = WriterLoggerT { fromWriterLoggerT :: StateT (Logs m) m a } deriving (Monad, MonadIO, Applicative, Functor)
 
-instance MonadTrans WriterLogger where
-    lift = WriterLogger . lift
+instance MonadTrans WriterLoggerT where
+    lift = WriterLoggerT . lift
 
-type instance LogFormat (WriterLogger m) = LogFormat m
+type instance LogFormat (WriterLoggerT m) = LogFormat m
 
---runWriterLoggerT :: (Functor m, Monad m) => WriterLogger m b -> m b
-runWriterLoggerT = flip runStateT mempty . fromWriterLogger
+--runWriterLoggerT :: (Functor m, Monad m) => WriterLoggerT m b -> m b
+runWriterLoggerT = flip runStateT mempty . fromWriterLoggerT
 
 class MonadWriterLogger m where
     getLogs :: m (Logs m)
     putLogs :: Logs m -> m ()
 
-instance Monad m => MonadWriterLogger (WriterLogger m) where
-    getLogs = WriterLogger State.get
-    putLogs = WriterLogger . State.put
+instance Monad m => MonadWriterLogger (WriterLoggerT m) where
+    getLogs = WriterLoggerT State.get
+    putLogs = WriterLoggerT . State.put
 
 withLogs f = do
     logs <- getLogs
     putLogs $ f logs
 
-instance (Monad m, Functor m, LogBuilderProto d (WriterLogger m) (LogFormat m), MonadLogger m)
-      => MonadRecord d (WriterLogger m)
+instance (Monad m, Functor m, LogBuilderProto d (WriterLoggerT m) (LogFormat m), MonadLogger m)
+      => MonadRecord d (WriterLoggerT m)
 
-instance (Functor m, Monad m, MonadLogger m) => MonadLogger (WriterLogger m) where
+instance (Functor m, Monad m, MonadLogger m) => MonadLogger (WriterLoggerT m) where
     appendLog l =  withLogs (|> l)
                 *> lift (appendLog l)
 
-instance (Monad m, MonadLoggerHandler n m) => MonadLoggerHandler n (WriterLogger m)
+instance (Monad m, MonadLoggerHandler n m) => MonadLoggerHandler n (WriterLoggerT m)

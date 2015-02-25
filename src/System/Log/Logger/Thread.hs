@@ -32,12 +32,12 @@ import           Control.Concurrent.MVar       (newEmptyMVar, putMVar, takeMVar)
 
 
 ----------------------------------------------------------------------
--- ThreadedLogger
+-- ThreadedLoggerT
 ----------------------------------------------------------------------
 
-newtype ThreadedLogger' d r m a = ThreadedLogger' { fromThreadedLogger :: ReaderT (InChan (ChMsg d r)) m a } deriving (Monad, MonadIO, Applicative, Functor, MonadTrans)
-type ThreadedLogger d m a = ThreadedLogger' d a m a
-type instance LogFormat (ThreadedLogger' d r m) = LogFormat m
+newtype ThreadedLoggerT' d r m a = ThreadedLoggerT' { fromThreadedLoggerT :: ReaderT (InChan (ChMsg d r)) m a } deriving (Monad, MonadIO, Applicative, Functor, MonadTrans)
+type ThreadedLoggerT d m a = ThreadedLoggerT' d a m a
+type instance LogFormat (ThreadedLoggerT' d r m) = LogFormat m
 
 data ChMsg m a = ChMsg (m ()) | End a | Exc SomeException
 
@@ -46,18 +46,18 @@ class MonadThreadLogger m n a | m-> n a where
 
 -- === Utils ===
 
-runRawThreadedLogger :: InChan (ChMsg d r) -> ThreadedLogger' d r m a -> m a
-runRawThreadedLogger ch = flip runReaderT ch . fromThreadedLogger
+runRawThreadedLoggerT :: InChan (ChMsg d r) -> ThreadedLoggerT' d r m a -> m a
+runRawThreadedLoggerT ch = flip runReaderT ch . fromThreadedLoggerT
 
 -- cutting out all the logs and sending them over channel, computing result
-runRawBaseThreadedLogger :: InChan (ChMsg d r) -> ThreadedLogger' d r (BaseLoggerT l m) a -> m a
-runRawBaseThreadedLogger ch = runRawBaseLoggerT . runRawThreadedLogger ch
+runRawBaseThreadedLoggerT :: InChan (ChMsg d r) -> ThreadedLoggerT' d r (BaseLoggerT l m) a -> m a
+runRawBaseThreadedLoggerT ch = runRawBaseLoggerT . runRawThreadedLoggerT ch
 
-runThreadedLogger :: (MonadIO m, Applicative m) => ThreadedLogger m (BaseLoggerT l IO) a -> m a
-runThreadedLogger m = do
+runThreadedLoggerT :: (MonadIO m, Applicative m) => ThreadedLoggerT m (BaseLoggerT l IO) a -> m a
+runThreadedLoggerT m = do
     (inChan, outChan) <- liftIO newChan
     liftIO $ forkIO $ do
-        out <- (End <$> runRawBaseThreadedLogger inChan m) `catch` (\e -> return (Exc e))
+        out <- (End <$> runRawBaseThreadedLoggerT inChan m) `catch` (return . Exc)
         writeChan inChan out
     loop outChan
     where loop :: (MonadIO m, Applicative m) => OutChan (ChMsg m a) -> m a
@@ -68,18 +68,18 @@ runThreadedLogger m = do
                   ChMsg d -> d *> loop ch
                   Exc   e -> liftIO $ throwIO e
 
-liftIOThread :: (MonadIO m, MonadThreadLogger m n a) => (IO () -> IO fa) -> ThreadedLogger' n a (BaseLoggerT l IO) b -> m b
+liftIOThread :: (MonadIO m, MonadThreadLogger m n a) => (IO () -> IO fa) -> ThreadedLoggerT' n a (BaseLoggerT l IO) b -> m b
 liftIOThread f m = do
     inChan <- getLogChan
     ret    <- liftIO $ newEmptyMVar
     liftIO . f $ do
-        out <- (End <$> runRawBaseThreadedLogger inChan m) `catch` (\e -> return (Exc e))
+        out <- (End <$> runRawBaseThreadedLoggerT inChan m) `catch` (return . Exc)
         case out of
             End v -> putMVar ret v
             Exc e -> putMVar ret undefined *> writeChan inChan (Exc e)
     liftIO $ takeMVar ret
 
-fork :: (MonadIO m, MonadThreadLogger m n a) => ThreadedLogger' n a (BaseLoggerT l IO) b -> m b
+fork :: (MonadIO m, MonadThreadLogger m n a) => ThreadedLoggerT' n a (BaseLoggerT l IO) b -> m b
 fork = liftIOThread forkIO
 
 withTarget :: (MonadThreadLogger m n a, MonadIO m) => n () -> m ()
@@ -89,17 +89,17 @@ withTarget f = do
 
 -- === Instances ===
 
-instance Monad m => MonadThreadLogger (ThreadedLogger' d r m) d r where
-    getLogChan = ThreadedLogger' Reader.ask
+instance Monad m => MonadThreadLogger (ThreadedLoggerT' d r m) d r where
+    getLogChan = ThreadedLoggerT' Reader.ask
 
 ---
 
-instance (MonadIO m, MonadRecord d n) => MonadRecord d (ThreadedLogger' n a m) where
+instance (MonadIO m, MonadRecord d n) => MonadRecord d (ThreadedLoggerT' n a m) where
     appendRecord = withTarget . appendRecord
 
-instance (MonadIO m, MonadLoggerHandler h d, LogFormat m ~ LogFormat d) => MonadLoggerHandler h (ThreadedLogger' d a m) where
+instance (MonadIO m, MonadLoggerHandler h d, LogFormat m ~ LogFormat d) => MonadLoggerHandler h (ThreadedLoggerT' d a m) where
     addHandler = withTarget . addHandler
 
-instance (MonadIO m, MonadPriorityLogger d) => MonadPriorityLogger (ThreadedLogger' d a m) where
+instance (MonadIO m, MonadPriorityLogger d) => MonadPriorityLogger (ThreadedLoggerT' d a m) where
     setPriority = withTarget . setPriority
     getPriority = error "Cannot get priority from within ThreadLogger!"
