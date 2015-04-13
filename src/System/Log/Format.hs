@@ -18,7 +18,8 @@ module System.Log.Format where
 import System.Log.Log               (Log)
 import System.Log.Data              (Lvl(Lvl), Msg(Msg), Loc(Loc), Time(Time), LocData(LocData), LevelData(LevelData), readData, DataOf, Lookup)
 import Data.Time.Clock              (UTCTime)
-import Data.Time.Format             (formatTime, defaultTimeLocale)
+import Data.Time.Format             (formatTime)
+import Data.Time.Locale.Compat      (defaultTimeLocale)
 import Text.PrettyPrint.ANSI.Leijen
 
 
