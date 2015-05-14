@@ -35,7 +35,8 @@ import           Control.Monad.State           (StateT, runStateT)
 import qualified Control.Monad.State           as State
 import           Control.Monad.IO.Class        (MonadIO, liftIO)
 import           System.Log.Format             (Formatter, runFormatter, defaultFormatter)
-import           Text.PrettyPrint.ANSI.Leijen  (Doc, putDoc)
+import qualified System.IO                     as IO
+import           Text.PrettyPrint.ANSI.Leijen  (Doc, putDoc, hPutDoc)
 
 ----------------------------------------------------------------------
 -- MonadLoggerHandler
@@ -86,11 +87,17 @@ setFormatter f = formatter .~ (Just f)
 
 -- === Handlers ===
 
+topHandler :: Monad m => Formatter l -> Handler m l
 topHandler fmt = mkHandler "TopHandler" (\_ _ -> return ()) Nothing
                & formatter .~ (Just fmt)
 
+printHandler :: MonadIO m => Maybe (Formatter l) -> Handler m l
 printHandler = mkHandler "PrintHandler" handle where
     handle defDoc l = liftIO $ putDoc defDoc *> putStrLn ""
+
+fileHandler :: MonadIO m => IO.Handle -> Maybe (Formatter l) -> Handler m l
+fileHandler h = mkHandler "FileHandler" (handle h) where
+    handle h defDoc l = liftIO $ hPutDoc h defDoc *> IO.hPutStrLn h ""
 
 ----------------------------------------------------------------------
 -- HandlerLoggerT
@@ -119,7 +126,10 @@ runHandler defDoc l h = act <* mapM (runHandler doc l) (h^.children) where
     runFilters h l = foldr (&&) True $ fmap (\f -> runFilter f l) (h^.filters)
 
 
+getTopHandler :: Monad m => HandlerLoggerT m (Handler (HandlerLoggerT m) (LogFormat m))
 getTopHandler = HandlerLoggerT State.get
+
+putTopHandler :: Monad m => Handler (HandlerLoggerT m) (LogFormat m) -> HandlerLoggerT m ()
 putTopHandler = HandlerLoggerT . State.put
 
 -- === Instances ===
