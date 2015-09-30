@@ -44,7 +44,7 @@ As every logger transformer, `BaseLogger` has an appriopriate transformer type c
 main = print =<< runBaseLogger (Lvl, Msg, Time) test
 ```
 
-There is one very important design decision. All the logger transformers, appart from the base one, pass the newly registered log to underlying transformers. This way we can create a transformer that writes messages to disk and combine it with the one, that registers the logs in a list. There are some examples showing this behavior later in this document.
+There is one very important design decision. All the logger transformers, apart from the base one, pass the newly registered log to underlying transformers. This way we can create a transformer that writes messages to disk and combine it with the one, that registers the logs in a list. There are some examples showing this behavior later in this document.
 
 ### WriterLogger
 
