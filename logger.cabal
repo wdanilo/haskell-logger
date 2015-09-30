@@ -75,7 +75,7 @@ library
       OverloadedStrings
 
   build-depends:
-      base >=4.7,
+      base >=4.7 && <= 4.9,
       transformers >=0.3.0.0 && <0.5,
       transformers-compat >=0.4.0.0 && <0.5,
       time >=1.4.2 && <1.6,
