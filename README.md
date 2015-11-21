@@ -34,11 +34,11 @@ main = print $ runBaseLogger (Lvl, Msg) test
 ```
 
 There are few things to note here:
-* We are importing the `System.Log.Simple` interface. It provides all necessary functions to start with the library. There is another interface, `System.Log.TH` (using `TemplateHaskell` to gather logs location information), which provides simmilar functionality, but allows additionally logging such informations like file or module name and log location inside the file.
+* We are importing the `System.Log.Simple` interface. It provides all necessary functions to start with the library. There is another interface, `System.Log.TH` (using `TemplateHaskell` to gather logs location information), which provides similar functionality, but allows additionally logging such informations like file or module name and log location inside the file.
 * We are running the logger using `runBaseLogger` function providing the description what type of information we want to gather with each call to `debug`, `warning`, etc. This is very important, because we can choose only the needed information, like messages and levels and run the logger as a pure code. If you try to run the example with other description, like ```(Lvl, Msg, Time)```, it will fail complaining that it needs the `IO` monad for that.
 * The `BaseLogger` is the most base logger transformer and it should be run as a base for every logger transformer stack. It does not log any messages under the hood, in fact you cannot do anything sensible with it.
 
-As every logger transformer, `BaseLogger` has an appriopriate transformer type called `BaseLoggerT`. You can use it just as every monad transformer, to pipe computations to an underlying monad. Using the transformer we can ask our logger to log also such information as the time:
+As every logger transformer, `BaseLogger` has an appropriate transformer type called `BaseLoggerT`. You can use it just as every monad transformer, to pipe computations to an underlying monad. Using the transformer we can ask our logger to log also such information as the time:
 
 ```haskell
 main = print =<< runBaseLogger (Lvl, Msg, Time) test
@@ -52,16 +52,16 @@ There is one very important design decision. All the logger transformers, appart
 ```haskell
 main = print $ (runBaseLogger (Lvl, Msg) . runWriterLoggerT) test
 ```
-As a result we get tuple, which first element is the functions return value, while the second is list of all Log messages. For now the log message is not very friendly nested-tuple structure, but it will change in the next versions of the library. To be clear, the single log looks like this at the moment:
+As a result we get tuple, whose first element is the function's return value, while the second is list of all Log messages. For now the log message is not very friendly nested-tuple structure, but it will change in the next versions of the library. To be clear, the single log looks like this at the moment:
 ```haskell
 Log {fromLog = (Data {recBase = Lvl, recData = LevelData 0 "Debug"},(Data {recBase = Msg, recData = "a debug"},()))}
 ```
 
-WiterLogger should work as fast as just `WriterT` monad transformer with `Dlist` used for logs gathering, because there should be no overhead introduced by the library.
+WriterLogger should work as fast as just `WriterT` monad transformer with `Dlist` used for logs gathering, because there should be no overhead introduced by the library.
 
 ### HandlerLogger
 
-`HandlerLogger` allows you to handle messages using handlers and log formatters. At last we will see something usefull as a logging library! To start, let's look at a simple example:
+`HandlerLogger` allows you to handle messages using handlers and log formatters. At last we will see something useful as a logging library! To start, let's look at a simple example:
 
 ```haskell
 import System.Log.Simple
@@ -84,7 +84,7 @@ As a result, we get a colored output (on all platforms, including Windows):
 
 Ok, so what's happening here? The function `addHandler` registers new log handler in current logger monad. The ```Nothing``` just indicates, that this handler does not need any special formatter and can use the default one, provided when executing the monad - in this case, the `defaultFormatter`. We can of course define our custom message formatters.
 
-For no only the `printHandler` is provided, but it is straightforward to define custom handlers. Other will be added in the next versions of the library.
+For now only the `printHandler` is provided, but it is straightforward to define custom handlers. Others will be added in the next versions of the library.
 
 #### Formatters
 
@@ -96,13 +96,13 @@ defaultFormatter = colorLvlFormatter ("[" <:> Lvl <:> "] ") <:> Msg
 
 You might ask now, what are `Lvl` or `Msg`. They are "data providers". You will learn about them later, for now just remember, you can use them while running loggers as well as defining formatters. There is one very important thing to note here - you cannot use any data provider in your logger, that was not declared to be gathered when the logger is run! In later chapters you will also learn how to create custom data providers.
 
-So what if we would like to output not only the message and it's priority level, but also the module name and location of the message in the source file? Such logger is also defined and it's called `defaultFormatterTH`. You cannot use it using the `Simple` interface, so lets see for now how it is defined:
+So what if we would like to output not only the message and its priority level, but also the module name and location of the message in the source file? Such logger is also defined and it's called `defaultFormatterTH`. You cannot use it using the `Simple` interface, so let's see for now how it is defined:
 
 ```haskell
 defaultFormatterTH = colorLvlFormatter ("[" <:> Lvl <:> "] ") <:> Loc <:> ": " <:> Msg
 ```
 
-It's output is simmilar to:
+Its output is similar to:
 
 ```haskell
 [Debug] Main.hs:4: a debug
@@ -136,7 +136,7 @@ As the output we get:
 
 ### ThreadedLogger
 
-The `ThreadedLogger` is a very fancy one. It allows separate the actual logging from program. Program is being run on a separate thread, while logs are being gathered by the main thread. You can fork the program as many times you want and all the logs will be send to the log-gather routine. This allows to get nicely not-broken output in terminal or in files from different threads. The program stops after all the logs have been processed. Lets look at the example:
+The `ThreadedLogger` is a very fancy one. It allows to separate the actual logging from program. Program is being run on a separate thread, while logs are being gathered by the main thread. You can fork the program as many times you want and all the logs will be sent to the log-gather routine. This allows to get nicely not-broken output in terminal or in files from different threads. The program stops after all the logs have been processed. Let's look at the example:
 
 ```haskell
 import           System.Log.Simple
@@ -171,12 +171,12 @@ As the output we get:
 [Debug] debug in fork
 ```
 
-The output may of course vary, based on the way threads will be sheduled, because we use `print` functions here. Anyway you can notice, that the prints were executed at the same time as all the logging.
+The output may of course vary, based on the way threads will be scheduled, because we use `print` functions here. Anyway you can notice, that the prints were executed at the same time as all the logging.
 It is important to use ```Thread.fork```, which is just a simple wrapper around `forkIO`.
 
 #### Exception handling
 
-All the loggers behave in a proper way, when an exception is rised. The exception will be evaluated after all necessary logging has been done:
+All the loggers behave in a proper way, when an exception is raised. The exception will be evaluated after all necessary logging has been done:
 
 ```haskell
 test = do
@@ -257,9 +257,9 @@ Which results in:
 
 It is possible to extend the logging framework in any way you want. All the functionality you have seen above are just simple logger transformers and you can modify them in a ton of ways or create custom ones.
 
-### Custom prioritiy levels
+### Custom priority levels
 
-Defining a custom priority levels is as easy as creating a new datatype that derives the `Enum` and start using it. The default prorities are defined as:
+Defining a custom priority level is as easy as creating a new datatype that derives the `Enum` and start using it. The default priorities are defined as:
 
 ```haskell
 data Level = Debug     -- ^ Debug Logs
@@ -317,7 +317,7 @@ Which results in:
 [Debug] my custom debug (7)
 ```
 
-A new function `appData` is used here. It allows providing a data to be registered when creating log messages. You can provide this way any data you want and only the data will be used, that is explicitly defined when running a logger. If you run a logger asking about data that was not provided when constructing the log, the framework will look for it's monad data provider (described later). If there will be no such provider, it will fail at compile-time.
+A new function `appData` is used here. It allows providing a data to be registered when creating log messages. You can provide this way any data you want and only the data will be used, that is explicitly defined when running a logger. If you run a logger asking about data that was not provided when constructing the log, the framework will look for its monad data provider (described later). If there will be no such provider, it will fail at compile-time.
 
 In fact, if we look how the log function is defined, we will find some similarities:
 
