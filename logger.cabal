@@ -2,10 +2,10 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ee2528e35aba79725f4e033e84bbe94b50d955e61530d0e6d8120929248b629d
+-- hash: 5738b550b5db5c70a81df34e4fb127b1c7e8db502b57700135b0bc2f1d6803cf
 
 name:           logger
-version:        0.1.0.2
+version:        0.1.1.0
 synopsis:       Fast & extensible logging framework
 description:    Logging is a fast and extensible Haskell logging framework.
                 .
