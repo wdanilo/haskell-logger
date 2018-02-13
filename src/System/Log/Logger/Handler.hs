@@ -45,8 +45,8 @@ import           Text.PrettyPrint.ANSI.Leijen  (Doc, putDoc, hPutDoc)
 class MonadLoggerHandler n m | m -> n where
     addHandler :: Handler n (LogFormat m) -> m ()
 
-    default addHandler :: (Monad m, MonadTrans t) => Handler n (LogFormat m) -> t m ()
-    addHandler = lift . addHandler
+    default addHandler :: (MonadLoggerHandler n m) => Handler n (LogFormat m) -> m ()
+    addHandler = addHandler
 
 instance (Monad m, MonadLoggerHandler n m) => MonadLoggerHandler n (ExceptT e m)
 instance (Monad m, MonadLoggerHandler n m) => MonadLoggerHandler n (ListT m)
