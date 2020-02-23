@@ -1,0 +1,81 @@
+name: logger
+version: '0.1.1.0'
+synopsis: Fast & extensible logging framework
+description: ! 'Logging is a fast and extensible Haskell logging framework.
+
+
+  Logging allows you to log any kind of messages in both IO as well as pure code,
+  depending on the informations you want to log.
+
+
+  The framework bases on the idea of logger transformer stack defining the way it
+  works. You can build your own stack to highly tailor the behaviour to your needs,
+  starting with such simple things, like logging messages to a list, ending on logging
+  compile-time, priority-filtered messages from different threads and gathering them
+  in other logger thread.
+
+
+  For detailed documentation and examples look at the ''''System.Log'''' module.'
+category: System
+author: Wojciech Danilo
+maintainer: Wojciech Danilo <wojciech.danilo@gmail.com>
+copyright: Copyright (C) 2015 Wojciech Danilo
+license: Apache-2.0
+homepage: https://github.com/wdanilo/haskell-logger
+git: git://github.com/wdanilo/haskell-logger.git
+bug-reports: https://github.com/wdanilo/haskell-logger/issues
+extra-source-files:
+- README.md
+default-extensions:
+- DefaultSignatures
+- ViewPatterns
+- DeriveFunctor
+- TupleSections
+- StandaloneDeriving
+- MultiParamTypeClasses
+- ConstraintKinds
+- FlexibleContexts
+- FlexibleInstances
+- GeneralizedNewtypeDeriving
+other-extensions:
+- KindSignatures
+- TypeFamilies
+- FunctionalDependencies
+- UndecidableInstances
+- NoMonomorphismRestriction
+- OverlappingInstances
+- TemplateHaskell
+- CPP
+- OverloadedStrings
+dependencies:
+- base >= 4.9
+- transformers >=0.3.0.0
+- transformers-compat >=0.4.0.0
+- time >=1.4.2
+- time-locale-compat >=0.1.0.1
+- ansi-wl-pprint >=0.6
+- lens >=4.6
+- template-haskell >=2.9
+- mtl >=2.1.3.1
+- containers >=0.5
+- unagi-chan >=0.3
+library:
+  source-dirs: src
+  exposed-modules:
+  - System.Log
+  - System.Log.Tuples
+  - System.Log.Simple
+  - System.Log.Filter
+  - System.Log.Level
+  - System.Log.Format
+  - System.Log.Data
+  - System.Log.Log
+  - System.Log.TH
+  - System.Log.Logger.Base
+  - System.Log.Logger.Writer
+  - System.Log.Logger.Thread
+  - System.Log.Logger.Priority
+  - System.Log.Logger.Handler
+  - System.Log.Logger.Drop
+stability: provisional
+tested-with: ghc ==8.2.2

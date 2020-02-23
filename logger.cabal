@@ -1,93 +1,72 @@
-name:                logger
-category:            System
-version:             0.1.0.2
-license:             Apache-2.0
-license-file:        LICENSE
-cabal-version:       >=1.10
-author:              Wojciech Danilo
-maintainer:          Wojciech Danilo <wojciech.danilo@gmail.com>
-stability:           provisional
-synopsis:            Fast & extensible logging framework
-copyright:           Copyright (C) 2015 Wojciech Danilo
-tested-with:         GHC == 7.8.3
-build-type:          Simple
-homepage:            https://github.com/wdanilo/haskell-logger
-bug-reports:         https://github.com/wdanilo/haskell-logger/issues
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 5738b550b5db5c70a81df34e4fb127b1c7e8db502b57700135b0bc2f1d6803cf
 
-description:
+name:           logger
+version:        0.1.1.0
+synopsis:       Fast & extensible logging framework
+description:    Logging is a fast and extensible Haskell logging framework.
+                .
+                Logging allows you to log any kind of messages in both IO as well as pure code, depending on the informations you want to log.
+                .
+                The framework bases on the idea of logger transformer stack defining the way it works. You can build your own stack to highly tailor the behaviour to your needs, starting with such simple things, like logging messages to a list, ending on logging compile-time, priority-filtered messages from different threads and gathering them in other logger thread.
+                .
+                For detailed documentation and examples look at the ''System.Log'' module.
+category:       System
+stability:      provisional
+homepage:       https://github.com/wdanilo/haskell-logger
+bug-reports:    https://github.com/wdanilo/haskell-logger/issues
+author:         Wojciech Danilo
+maintainer:     Wojciech Danilo <wojciech.danilo@gmail.com>
+copyright:      Copyright (C) 2015 Wojciech Danilo
+license:        Apache-2.0
+license-file:   LICENSE
+tested-with:    ghc ==8.2.2
+build-type:     Simple
+cabal-version:  >= 1.10
 
-  Logging is a fast and extensible Haskell logging framework.
-  .
-  Logging allows you to log any kind of messages in both IO as well as pure code, depending on the informations you want to log.
-  .
-  The framework bases on the idea of logger transformer stack defining the way it works. You can build your own stack to highly tailor the behaviour to your needs, starting with such simple things, like logging messages to a list, ending on logging compile-time, priority-filtered messages from different threads and gathering them in other logger thread.
-  .
-  For detailed documentation and examples look at the ''System.Log'' module.
-
-extra-source-files:  README.md
+extra-source-files:
+    README.md
 
 source-repository head
   type: git
   location: git://github.com/wdanilo/haskell-logger.git
 
 library
-  exposed-modules:
-      System.Log,
-      System.Log.Tuples,
-      System.Log.Simple,
-      System.Log.Filter,
-      System.Log.Level,
-      System.Log.Format,
-      System.Log.Data,
-      System.Log.Log,
-      System.Log.TH,
-      System.Log.Logger.Base,
-      System.Log.Logger.Writer,
-      System.Log.Logger.Thread,
-      System.Log.Logger.Priority,
-      System.Log.Logger.Handler,
-      System.Log.Logger.Drop
-
-  -- other-modules:
-
-  default-extensions:
-      DefaultSignatures,
-      ViewPatterns,
-      DeriveFunctor,
-      TupleSections,
-      StandaloneDeriving,
-      MultiParamTypeClasses,
-      ConstraintKinds,
-      FlexibleContexts,
-      FlexibleInstances,
-      GeneralizedNewtypeDeriving
-
-  -- LANGUAGE extensions used by modules in this package.
-  other-extensions:
-      KindSignatures,
-      TypeFamilies,
-      FunctionalDependencies,
-      UndecidableInstances,
-      NoMonomorphismRestriction,
-      OverlappingInstances,
-      TemplateHaskell,
-      CPP,
-      OverloadedStrings
-
+  hs-source-dirs:
+      src
+  default-extensions: DefaultSignatures ViewPatterns DeriveFunctor TupleSections StandaloneDeriving MultiParamTypeClasses ConstraintKinds FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving
+  other-extensions: KindSignatures TypeFamilies FunctionalDependencies UndecidableInstances NoMonomorphismRestriction OverlappingInstances TemplateHaskell CPP OverloadedStrings
   build-depends:
-      base >=4.7 && <= 4.9,
-      transformers >=0.3.0.0,
-      transformers-compat >=0.4.0.0,
-      time >=1.4.2,
-      time-locale-compat >=0.1.0.1,
-      ansi-wl-pprint >=0.6,
-      lens >=4.6,
-      template-haskell >=2.9,
-      mtl >=2.1.3.1,
-      containers >=0.5,
-      unagi-chan >=0.3
-
-  hs-source-dirs:      src
-
-  default-language:    Haskell2010
-
+      ansi-wl-pprint >=0.6
+    , base >=4.9
+    , containers >=0.5
+    , lens >=4.6
+    , mtl >=2.1.3.1
+    , template-haskell >=2.9
+    , time >=1.4.2
+    , time-locale-compat >=0.1.0.1
+    , transformers >=0.3.0.0
+    , transformers-compat >=0.4.0.0
+    , unagi-chan >=0.3
+  exposed-modules:
+      System.Log
+      System.Log.Tuples
+      System.Log.Simple
+      System.Log.Filter
+      System.Log.Level
+      System.Log.Format
+      System.Log.Data
+      System.Log.Log
+      System.Log.TH
+      System.Log.Logger.Base
+      System.Log.Logger.Writer
+      System.Log.Logger.Thread
+      System.Log.Logger.Priority
+      System.Log.Logger.Handler
+      System.Log.Logger.Drop
+  other-modules:
+      Paths_logger
+  default-language: Haskell2010
